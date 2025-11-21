@@ -3,9 +3,9 @@
 
 -- name: Zarif Bin Mohd Zamrin
 
-{- DOCUMENTATION: Referenced Haskell quick reference  as well as watched a video by Derek Banas to help understand Tuples and Elem functions. Discussed with C2C McBrayer with regards to the wrap around feature. I ended up giving up
-                  and submitting this PEX without the wrap around feature. Did not refer to a picture of the solution I took during class because I deleted it right after I took it as well as not trying to cheat the teacher or myself.
-}
+{- DOCUMENTATION: Referenced Haskell quick reference  as well as watched a video by Derek Banas to help understand Tuples and Elem functions.I also googled options on how to remove the last element in a list to which I found init and read about it further through reddit. Discussed with C2C McBrayer with regards to the wrap around feature. 
+                  Did not refer to a picture of the solution I took during class because I deleted it right after I took it as well as not trying to cheat the teacher or myself.
+-}
 
 unKnot :: [(Char, Char)] -> String
 unKnot tripCode
@@ -19,20 +19,47 @@ typeIknot :: [(Char,Char)]  -> [(Char,Char)]
 
 typeIknot [] = []
 typeIknot [x] = [x]
+typeIknot tripcode
+    | wrapExist tripcode = removeWrap tripcode
 
 typeIknot ((c1,t1) : (c2,t2) : xs)
     | c1 == c2 && not (t1 == t2) = xs
     | otherwise = (c1,t1) : typeIknot ((c2,t2):xs) 
 
+wrapExist :: [(Char,Char)]  -> Bool
+wrapExist [] = False
+wrapExist [x] = False
+wrapExist tripcode
+    | fst (head tripcode) == fst (last tripcode) && not (snd (head tripcode) == snd (last tripcode)) = True
+    | otherwise = False
+
+removeWrap :: [(Char,Char)]  -> [(Char,Char)]
+removeWrap [] = []
+removeWrap [x] = []
+removeWrap tripcode
+    | wrapExist tripcode = tail (init tripcode)
+    | otherwise = tripcode
+
 
 
 typeIIknot :: [(Char,Char)] -> [(Char,Char)]
 typeIIknot tripcode
+    | wrapExist2 tripcode = typeIIknot (removeWrap2 tripcode)
     | findOver tripcode == [] = tripcode
     | findUnder (fst(head(findOver tripcode))) (fst(head(tail(findOver tripcode))))  tripcode == [] = tripcode
     | otherwise = typeIIknot (remove (findOver tripcode) (findUnder (fst(head(findOver tripcode))) (fst(head(tail(findOver tripcode))))  tripcode) tripcode)   -- chain of procedures. removes pairs that are determined by findOver, findUnder finds the matching pairs for the findOver, and removes the pairs from the original tripcode
 
+wrapExist2 :: [(Char,Char)] -> Bool
+wrapExist2 [] = False
+wrapExist2 [x] = False
+wrapExist2 tripcode
+    | snd (last tripcode) == 'o' && snd (head tripcode) == 'o' && not (findUnder (fst(last tripcode)) (fst (head tripcode)) tripcode == [] ) = True
+    | otherwise = False
 
+removeWrap2 :: [(Char,Char)] -> [(Char,Char)]
+removeWrap2 tripcode
+    | wrapExist2 tripcode = remove [(last tripcode), (head tripcode)] (findUnder (fst (last tripcode)) (fst (head tripcode)) tripcode) tripcode
+    | otherwise = tripcode
 
 findOver :: [(Char,Char)] -> [(Char,Char)]
 findOver [] = []
@@ -91,7 +118,7 @@ main = do
    print(t04)
    print("Result: " ++ unKnot t04)
 
-   let t05 = [('a','o'),('b','o'),('c','u'),('a','u'),('b','u'),('c','o')]
+   let t05 = [ ('a','o') , ('c','u') , ('b','u') , ('c','o') ,  ('d','u') , ('a','u'),('d','o') ]
    print("Test case t05" )
    print(t05)
    print("Result: " ++ unKnot t05)
